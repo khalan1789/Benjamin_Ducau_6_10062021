@@ -7,7 +7,7 @@ const path = require('path');
 
 const URL_PATH = process.env.URL_PATH; 
 const sauceRoutes = require('./routes/sauce');
-const auth = require('./routes/user'); //rajouté avant de couper
+const auth = require('./routes/user'); 
 
 const app = express();
 
