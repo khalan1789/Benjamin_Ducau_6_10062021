@@ -51,123 +51,83 @@ exports.deleteSauce = (req, res, next) => {
 
 exports.getAllSauce = (req, res, next) => {
     Sauce.find()
-      .then(sauces => res.status(200).json({sauces}))
+      .then(sauces => res.status(200).json(sauces))
       .catch(error => res.status(400).json({ error}))
 };
 
  // système de like
 
  exports.voteSauce = (req, res, next) => {
-  console.log(req.body.userId )
-  const vote = req.body.like;
-  sauce.findOne({_id : req.params.id})
-  .then( sauce => {
-  switch(vote){
-    case "1" : //console.log("j'aime")
-    // res.status(201).json({message : "j'aime ok"})
-      Sauce.updateOne({_id : req.params.id}, {
-               $push : { usersLiked : req.body.userId}
-            }, {$inc : {likes : +1 }})
-            .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-            .catch(error => res.status(500).json({ error}))
-            break;
-    case "-1" : // console.log("j'aime pas")
-    // res.status(201).json({message : "j'aime pas c'est bon"})
-      Sauce.updateOne({_id : req.params.id}, {
-        $push : { usersDisliked : req.body.userId}, /*$inc : {dislikes : +1 }*/
-      })
-            .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
-            .catch(error => res.status(500).json({ error}))
-            break;   
-  }
-})
+    const vote = req.body.like;
+    Sauce.findOne({_id : req.params.id})
+      .then( sauce => {
+        switch(vote){
+
+          case 1 :
+            console.log("oui enfin") 
+            Sauce.updateOne({_id : req.params.id}, {
+              $push : { usersLiked : req.body.userId},$inc : {likes : +1 }
+            })
+                .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
+                .catch(error => res.status(500).json({ message: "error case 1"}))       
+          break;
+
+          case -1 :
+            console.log("ça mets bien moins")
+            Sauce.updateOne({_id : req.params.id}, {
+              $push : { usersDisliked : req.body.userId}, $inc : {dislikes : +1 }
+            })
+                .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
+                .catch(error => res.status(500).json({message:" error case -1"}))
+          break;
+
+          case 0 :  
+          console.log("ca annule")
+            Sauce.updateOne({_id : req.params.id}, { 
+              $pull : { usersLiked : req.body.userId, usersDisliked : req.body.userId}
+            })
+                .then(() => res.status(201).json({message : "vote réinitialisé"}))
+                .catch(error => res.status(500).json({ message : "error case 0"}))
+          break;  
+            
+          default : console.log("ça arrive sur le défault")
+      }
+      
+  })      
+
   .catch(error => res.status(500).json({ message : "ça n'a pas swicthé"}))
 }
 
 //// NE PAS Y PRETER ATTENTION A LA PARTIE D'APRES :) ////
-//  exports.voteSauce = (req, res, next) => {
-//   Sauce.findOne({_id : req.params.id})
-//     .then(sauce => {
-//       const vote = req.body.like;
-//       switch(vote){
-//         case vote = 1 :
-//           // if(!sauce.usersLiked[req.params.userId]){
-//             Sauce.updateOne({_id : req.params.id}, {
-//                $push : { usersLiked : sauce.userId}, /* $inc : {likes : +1 } */
-//             })
-//             .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-//             .catch(error => res.status(500).json({ error}))
-              
-//           // }
-//           // else{
-//           //   console.log("l'utilisateur a déjà cliqué sur j'aime!")
-//           // };
-//           break;
-      
-//         case vote = -1 :
-//           // if(!sauce.usersDislikes[req.params.userId]){
-//             Sauce.updateOne({_id : req.params.id}, {
-//               $push : { usersDisliked : sauce.userId}, /* $inc : {likes : -1 }*/
-//             })
-//               .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
-//               .catch(error => res.status(500).json({ error}))   
-//           // }
-//           // else{
-//           //   console.log("l'utilisateur a déjà cliqué sur je n'aime pas...!")
-//           // }
-//           break;
-//         case vote = 0 :
-//           // supprimer l'id user du tableau dans lequel il était et mettre -1 dans le total de ce tableau là
-//           // : array fonction mongoDb à voir.
-//           Sauce.updateOne({_id : req.params.id}, {
-//              $pull : { usersLiked : sauce.userId, usersDisliked : sauce.userId}
-//           })
-//             .then(() => res.status(201).json({message : "vote réinitialisé"}))
-//             .catch(error => res.status(500).json({ error}))
-//           break;   
-//       };       
-//     })
-//     .catch(error => res.status(500).json({error : error}))
-// };
-  
-// if (vote = 1){
-//   if(il n'y a pas l'user dans le tableau des likes){
-//   //mettre la fonction pour ajouter l'id au tableau like
-//   likes +=1
-//   }
-//   else{
-//     console.log("l'utilisateur a déjà cliqué sur j'aime!")
-//   }
-// }
-
-// if (vote = -1){
-//   if(il n'y a pas l'user dans le tableau des likes){
-//   //mettre la fonction pour ajouter l'id au tableau like
-//   dislikes +=1
-//   }
-//   else{
-//     console.log("l'utilisateur a déjà cliqué sur je n'aime pas...!")
-//   }
-// }
-
-// if(vote = 0){
-//   supprimer l'id user du tableau dans lequel il était et mettre -1 dans ce tableau là
-//   : array fonction mongoDb à voir.
-// } 
-
-/****************AVANT DE TESTER LE SWITCH
+/*
+Bout de code fonctionnel pour inc et push j'aime
+ Sauce.updateOne({_id : req.params.id}, {
+        $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
+      })
+      .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
+      .catch(error => res.status(500).json({ error}))
  * 
  * 
- *exports.voteSauce = (req, res, next) => {
-//Sauce.findOne({_id : req.params.id})
- * then(sauce => {
-      console.log(sauce)
-      console.log(req.body)
-      res.status(201).json({ message : "i know you like it"})
-    })
-    .catch(error => res.status(405).json({message : "errrrrrreeeeuur"}))
- * 
- * 
- * 
+ * usersLiked.find().forEach(id => { 
+        if(id == userId) {
+          res.status(401).json({message : "l'utilisateur aime déjà !"})
+          // console.log("oui enfin") 
+          // Sauce.updateOne({_id : req.params.id}, { 
+          //   $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
+          // })
+          // .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
+          // .catch(error => res.status(500).json({ error}))
+        }
+        
+        else{
+          console.log("oui enfin") 
+          Sauce.updateOne({_id : req.params.id}, {
+            $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
+          })
+          .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
+          .catch(error => res.status(500).json({ error}))
+            // console.log("uilisateur aime déjà")
+            // res.status(401).json({message : "l'utilisateur aime déjà !"})
+        }  
  * 
  */
