@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const path = require('path');
+const rateLimit = require("./middleware/ratelimit");
+const helmet = require("helmet");
 
 
 const URL_PATH = process.env.URL_PATH; 
@@ -10,6 +12,8 @@ const sauceRoutes = require('./routes/sauce');
 const auth = require('./routes/user'); 
 
 const app = express();
+app.use(rateLimit);
+app.use(helmet());
 
 mongoose.connect(process.env.URL_PATH,
   { useNewUrlParser: true,
@@ -23,6 +27,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
+
 
 app.use(bodyParser.json());
 
