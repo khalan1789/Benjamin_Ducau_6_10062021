@@ -71,16 +71,14 @@ exports.getAllSauce = (req, res, next) => {
           break;
 
           case -1 :
-            console.log("ça mets bien moins")
             Sauce.updateOne({_id : req.params.id}, {
               $push : { usersDisliked : req.body.userId}, $inc : {dislikes : +1 }
             })
                 .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
-                .catch(error => res.status(500).json({message:" error case -1"}))
+                .catch(error => res.status(500).json({error : error}))
           break;
 
           case 0 :  
-          console.log("ca annule")
             Sauce.findOne({_id : req.params.id})
                 .then(sauce => {
                     if (sauce.usersLiked.includes(req.body.userId)){
@@ -99,90 +97,10 @@ exports.getAllSauce = (req, res, next) => {
                     }
 
                 }) 
-                .catch(error => res.status(500).json({ message : "error case 0"}))
+                .catch(error => res.status(500).json({ error}))
           break;  
             
-          default : console.log("ça arrive sur le défault")
+          default : console.log(req.body)
       }
     
 }
-
-//// NE PAS Y PRETER ATTENTION A LA PARTIE D'APRES :) ////
-/*
-22/06
- exports.voteSauce = (req, res, next) => {
-    const vote = req.body.like;
-    Sauce.findOne({_id : req.params.id})
-      .then( sauce => {
-        switch(vote){
-
-          case 1 :
-            console.log("oui enfin") 
-            Sauce.updateOne({_id : req.params.id}, {$inc : {likes : +1 },
-              $push : { usersLiked : req.body.userId}
-            })
-                .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-                .catch(error => res.status(500).json({ message: "error case 1"}))       
-          break;
-
-          case -1 :
-            console.log("ça mets bien moins")
-            Sauce.updateOne({_id : req.params.id}, {
-              $push : { usersDisliked : req.body.userId}, $inc : {dislikes : +1 }
-            })
-                .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
-                .catch(error => res.status(500).json({message:" error case -1"}))
-          break;
-
-          case 0 :  
-          console.log("ca annule")
-            Sauce.updateOne({_id : req.params.id}, { 
-              $pull : { usersLiked : req.body.userId, usersDisliked : req.body.userId}, $inc:{cancel : +1}
-            })
-                .then(() => res.status(201).json({message : "vote réinitialisé"}))
-                .catch(error => res.status(500).json({ message : "error case 0"}))
-          break;  
-            
-          default : console.log("ça arrive sur le défault")
-      }
-      
-  })      
-
-  .catch(error => res.status(500).json({ message : "ça n'a pas swicthé"}))
-}
-
-
-
-
-
-Bout de code fonctionnel pour inc et push j'aime
- Sauce.updateOne({_id : req.params.id}, {
-        $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
-      })
-      .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-      .catch(error => res.status(500).json({ error}))
- * 
- * 
- * usersLiked.find().forEach(id => { 
-        if(id == userId) {
-          res.status(401).json({message : "l'utilisateur aime déjà !"})
-          // console.log("oui enfin") 
-          // Sauce.updateOne({_id : req.params.id}, { 
-          //   $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
-          // })
-          // .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-          // .catch(error => res.status(500).json({ error}))
-        }
-        
-        else{
-          console.log("oui enfin") 
-          Sauce.updateOne({_id : req.params.id}, {
-            $push : { usersLiked : req.body.userId},$inc : {likes : 1 }
-          })
-          .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-          .catch(error => res.status(500).json({ error}))
-            // console.log("uilisateur aime déjà")
-            // res.status(401).json({message : "l'utilisateur aime déjà !"})
-        }  
- * 
- */

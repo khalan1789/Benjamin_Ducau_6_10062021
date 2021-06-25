@@ -7,7 +7,7 @@ const rateLimit = require("./middleware/ratelimit");
 const helmet = require("helmet");
 
 
-const URL_PATH = process.env.URL_PATH; 
+const URL_PATH = process.env.path; 
 const sauceRoutes = require('./routes/sauce');
 const auth = require('./routes/user'); 
 
@@ -15,7 +15,7 @@ const app = express();
 app.use(rateLimit);
 app.use(helmet());
 
-mongoose.connect(process.env.URL_PATH,
+mongoose.connect(process.env.path,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à la bdd MongoDB réussie !'))
