@@ -5,9 +5,10 @@ const mongoose = require("mongoose");
 const path = require('path');
 const rateLimit = require("./middleware/ratelimit");
 const helmet = require("helmet");
+const cookieSession = require("cookie-session");
 
 
-const URL_PATH = process.env.path; 
+const URL_PATH = process.env.db; 
 const sauceRoutes = require('./routes/sauce');
 const auth = require('./routes/user'); 
 
@@ -15,7 +16,7 @@ const app = express();
 app.use(rateLimit);
 app.use(helmet());
 
-mongoose.connect(process.env.path,
+mongoose.connect(URL_PATH,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à la bdd MongoDB réussie !'))
@@ -28,8 +29,18 @@ app.use((req, res, next) => {
     next();
   });
 
+//mise en place des cookies en http only
+app.use(cookieSession({
+  secret: "sessionS3cur3",
+  cookie : {
+    secure : true,
+    httpOnly : true,
+    domain : "http://localhost:3000"
+  }
+}))
 
-app.use(bodyParser.json());
+
+app.use(express.json());
 
 app.use('/images', express.static(path.join(__dirname,'images')));
 app.use('/api/sauces', sauceRoutes);
