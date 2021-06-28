@@ -2,9 +2,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const jwt = require("jsonwebtoken");
 
-//masquage de données via maskdata
+//masquage de données via maskdata 
 const MaskData = require("maskdata");
-
 
 
 exports.signup = (req, res, next) => {
@@ -18,7 +17,7 @@ exports.signup = (req, res, next) => {
                 .then(() => res.status(201).json({ message : "création de l'utilisateur réussie !"}))
                 .catch(error => res.status(400).json({ error }))
         })
-        .catch(error => res.status(500).json({ error : "là ça veut pas..." }))
+        .catch(error => res.status(500).json({error}))
 };
 
 exports.login = (req, res, next) => {
@@ -45,3 +44,4 @@ exports.login = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }))
 };
+

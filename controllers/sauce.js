@@ -3,11 +3,19 @@ const Sauce = require('../models/sauce');
 const fs = require('fs');
 const sauce = require('../models/sauce');
 
+//ajout de la protection xss désactivé via helmet
+const xss = require("xss")
+
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
     const sauce = new Sauce({
-      ...sauceObject,
+      userId :  xss(sauceObject.userId),
+      name : xss(sauceObject.name),
+      manufacturer : xss(sauceObject.manufacturer),
+      description :  xss(sauceObject.description),
+      mainPepper :  xss(sauceObject.mainPepper),
+      heat : sauceObject.heat,
       likes : "0",
       dislikes : "0",
       usersLiked : [],
@@ -56,18 +64,16 @@ exports.getAllSauce = (req, res, next) => {
 };
 
  // système de like
-
  exports.voteSauce = (req, res, next) => {
     const vote = req.body.like;
     switch(vote){
 
           case 1 :
-            console.log("oui enfin") 
-            Sauce.updateOne({_id : req.params.id}, {$inc : {likes : +1 },
+              Sauce.updateOne({_id : req.params.id}, {$inc : {likes : +1 },
               $push : { usersLiked : req.body.userId}
             })
-                .then(() => res.status(201).json({message : "USER DE j'aime ajouté"}))
-                .catch(error => res.status(500).json({ message: "error case 1"}))       
+                .then(() => res.status(201).json({message : "J'aime ajouté"}))
+                .catch(error => res.status(500).json({ error}))       
           break;
 
           case -1 :
@@ -75,7 +81,7 @@ exports.getAllSauce = (req, res, next) => {
               $push : { usersDisliked : req.body.userId}, $inc : {dislikes : +1 }
             })
                 .then(() => res.status(201).json({message : "je n'aime pas ajouté"}))
-                .catch(error => res.status(500).json({error : error}))
+                .catch(error => res.status(500).json({ error }))
           break;
 
           case 0 :  
@@ -86,14 +92,14 @@ exports.getAllSauce = (req, res, next) => {
                         $pull : { usersLiked : req.body.userId}, $inc : {likes : -1 }
                       })
                         .then(() => res.status(201).json({message : "j'aime a été retiré !"}))
-                        .catch(error => res.status(500).json({message:" error enlèvement du j'aime"}))
+                        .catch(error => res.status(500).json({error}))
                     }
                     else{
                       Sauce.updateOne({_id : req.params.id}, {
                         $pull : { usersDisliked : req.body.userId}, $inc : {dislikes : -1 }
                       })
                         .then(() => res.status(201).json({message : "je n'aime pas été retiré !"}))
-                        .catch(error => res.status(500).json({message:" error enlèvement du je n'aime pas"}))
+                        .catch(error => res.status(500).json({ error }))
                     }
 
                 }) 

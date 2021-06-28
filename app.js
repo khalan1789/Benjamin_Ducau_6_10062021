@@ -13,7 +13,11 @@ const sauceRoutes = require('./routes/sauce');
 const auth = require('./routes/user'); 
 
 const app = express();
+
+//mise en place d'une écoute maximum des requêtes
 app.use(rateLimit);
+
+//mise en place protection xss
 app.use(helmet());
 
 mongoose.connect(URL_PATH,
