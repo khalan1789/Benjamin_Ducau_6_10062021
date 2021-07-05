@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+
+//middleware pour renforcer la sécurité sur les routes
 const auth = require("../middleware/auth");
+
 const multer = require("../middleware/config-multer");
 const sauceCtrl = require("../controllers/sauce");
 
